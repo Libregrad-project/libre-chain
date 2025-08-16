@@ -24,10 +24,19 @@ void throwNotGood(std::istream& stream) {
 // FIXME: Add a better and clearer name for parserResponseStatusFromString; Currently,
 // It isn't as clear as it should be.
 
+// The code block below is in general the same is the CryptoNote source code,
+// The main changes are within the general code strucutre, and variable names. 
+// Within this block, we have added UNEXPECTED_REQUEST, instead of the original UNEXPECTED_SYMBOL.
+
 namespace Libre {
     HttpResponse::HTTP_STATUS HttpParser::parserResponseStatusFromString(const std::string& status) {
-        // TODO: Add the needed if statements, for example: if the status is `200 OK` then 
-        // return that from Libre::HttpResponse::STATUS_200.
-        // We do this with 404 & 500 aswell.
+        if (status == "200 OK" || status = "200 Ok") return Libre::HttpResponse::STATUS_200;
+        else if (status == "404 Not Found") return Libre::HttpResponse::STATUS_404;
+        else if (status == "500 Internal Server Error") return Libre::HttpResponse::STATUS_500;
+        else throw std::system_error(make_error_code(Libre::error::HttpParserErrorCodes::UNEXPECTED_REQUEST),
+            "Unknown HTTP status code is given");
+
+        return Libre::HttpResponse::STATUS_200;
+
     }
 }
