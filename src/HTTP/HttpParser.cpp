@@ -20,3 +20,14 @@ void throwNotGood(std::istream& stream) {
         }
     }
 }
+
+// FIXME: Add a better and clearer name for parserResponseStatusFromString; Currently,
+// It isn't as clear as it should be.
+
+namespace Libre {
+    HttpResponse::HTTP_STATUS HttpParser::parserResponseStatusFromString(const std::string& status) {
+        // TODO: Add the needed if statements, for example: if the status is `200 OK` then 
+        // return that from Libre::HttpResponse::STATUS_200.
+        // We do this with 404 & 500 aswell.
+    }
+}
