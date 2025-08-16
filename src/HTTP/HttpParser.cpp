@@ -39,4 +39,31 @@ namespace Libre {
         return Libre::HttpResponse::STATUS_200;
 
     }
+
+    // INFO: The function below checks the recieved requests, and reads the parameters,
+    // For example, the method, url ...
+
+    void HttpParser::recieveRequest(std::istream& stream, HttpRequest& request) {
+        readWord(stream, request.method);
+        readWord(stream, request.url);
+
+        std::string httpVersion;
+        readWord(stream, httpVersion);
+
+        readHeaders(stream, request.headers);
+
+
+        // INFO: If there is a bodyLen, which possibly is any additional arguments,
+        // we will read the body, from request.body.
+
+        // NOTE: I can be wrong; i'll need to dive deeper into the code
+        // to know for sure.
+
+        std::string body;
+        size_t bodyLen = getBodyLen(request.headers);
+        if (bodyLen) {
+            readBody(stream, request.body, bodyLen);
+        }
+    }
+
 }
