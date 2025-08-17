@@ -72,7 +72,7 @@ namespace Libre {
     // to the response. 
 
     // FIXME: I can be incorrect with some parts, i am working on it. 
-    
+
     void HttpParser::recieveResponse(std::istream& stream, HttpResponse& response) {
         std::string httpVersion;
         readWord(stream, httpVersion);
@@ -127,6 +127,29 @@ namespace Libre {
         response.setBody(body);
     }
 
+    // TODO: Figure out what this does exactly. I assume this checks
+    // the words within the stream, but words can be broad.
 
+    void HttpParser::readWord(std::istream& stream, std::string& word) {
+        char c;
+
+        stream.get(c);
+        while (stream.good() && c != ' ' && c != '\r') {
+            word += c;
+            stream.get(c);
+
+            throwNotGood(stream);
+
+            if (c == '\r') {
+                stream.get(c);
+
+                if (c != '\n') {
+                    throw std::system_error(make_error_code(Libre::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
+                }
+            }
+        }
+    }
+
+    
 
 }
