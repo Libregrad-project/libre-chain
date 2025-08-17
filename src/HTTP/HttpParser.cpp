@@ -66,4 +66,67 @@ namespace Libre {
         }
     }
 
+
+    // INFO: Here, we define the recieveResponse, within here, we check
+    // the recieved response that we recieved.  We read the header and add it
+    // to the response. 
+
+    // FIXME: I can be incorrect with some parts, i am working on it. 
+    
+    void HttpParser::recieveResponse(std::istream& stream, HttpResponse& response) {
+        std::string httpVersion;
+        readWord(stream, httpVersion);
+
+        std::string status;
+        char c;
+
+        stream.get(c);
+        while (stream.good() && c != '\r') {
+            status += c;
+            stream.get(c);
+        }
+
+        throwNotGood(stream);
+
+        if (c == '\r') {
+            stream.get(c);
+
+            if (c != '\n') {
+                throw std::runtime_error("Parser error: '\\n' symbol is expected.");
+            }
+        }
+
+        response::setStatus(parserResponseStatusFromString(status));
+
+        std::string name;
+        std::string value;
+
+        while (readHeader(steam, name, value)) {
+            response.addHeader(name, value);
+            name.clear();
+            value.clear();
+        }
+
+        response.addHeader(name, value);
+        auto headers = response.getHeaders();
+        size_t length = 0;
+        auto it = headers.find("content-length");
+
+        if (it != headers.end()) {
+            length = std::stoul(it->second);
+        }
+
+        std::string body;
+        if (length) {
+            readBody(stream, body, length);
+        }
+        
+        // INFO: Here we set the response body to
+        // the body that we have read from above.
+
+        response.setBody(body);
+    }
+
+
+
 }
