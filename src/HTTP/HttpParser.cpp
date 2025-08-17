@@ -150,6 +150,26 @@ namespace Libre {
         }
     }
 
-    
 
+
+    // INFO: Here, we read the headers from the text stream, 
+    // and store them inside a container (headers).
+    // Then we reset the strings temporarly for next iteration.
+
+    // At the end, either a end of stream happend or an error occured,
+    // whenever the stream hits the empty line, it'll terminate.
+
+    void HttpParser::readHeaders(std::istream& stream, HttpRequest::Headers& headers) {
+        std::string name;
+        std::string value;
+
+        while (readHeaders(stream, name, value)) {
+            headers[name] = value;
+            name.clear();
+            value.clear();
+        }
+
+        headers[name] = value;
+
+    }
 }
