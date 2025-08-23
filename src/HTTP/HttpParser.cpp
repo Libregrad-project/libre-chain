@@ -235,7 +235,18 @@ namespace Libre {
     }
 
 
+    // INFO: Within this code-block, we essentially read how long
+    // the body is. We do it using the bytes.
 
+    size_t HttpParser::getBodyLen(const HttpRequest::Headers& headers) {
+        auto it = headers.find("content-length");
+        if (it != headers.end()) {
+            size_t bytes = std::stoul(it->second);
+            return bytes;
+        }
+
+        return 0;
+    }
 
 
 
