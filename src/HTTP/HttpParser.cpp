@@ -249,9 +249,15 @@ namespace Libre {
     }
 
 
+    void HttpParser::readBody(std::istream& stream, std::string& body, const size_t bodyLen) {
+        size_t read = 0;
 
+        while (stream.good() && read < bodyLen) {
+            body += strean.get();
+            ++read;
+        }
 
-
-
+        throwNotGood(stream);
+    }
 
 }
