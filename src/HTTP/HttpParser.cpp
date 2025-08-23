@@ -172,4 +172,75 @@ namespace Libre {
         headers[name] = value;
 
     }
+
+
+    // INFO: Reads one HTTP header line from the stream.
+    // Splits it into `name` (before ':') and `value` (after ':'),
+    // normalizes the name to lowercase, and returns:
+    //   - true  → if a header was successfully read,
+    //   - false → if an empty line ("\r\n") was found, meaning end of headers.
+
+    bool HttpParser::readHeader(std::istream& stream, std::string& name, std::string& value) {
+        char c;
+        bool isName = true;
+
+        stream.get(c);
+        while (stream.good() && c != '\r') {
+            if (c == ':') {
+                if (stream.peek() == ' ') {
+                    stream.get(c);
+                }
+
+                if (name.empty()) {
+                    throw std::system_error(make_error_code(Libre::error::HttpParserErrorCodes::EMPTY_HEADER));
+                }
+
+                if (isName) {
+                    isName = false;
+                    stream.get(c);
+                    continue;
+                }
+            }
+
+            if (isName) {
+                name += c;
+                stream.get(c);
+            } else {
+                value += c;
+                stream.get(c);
+            }
+
+        }
+
+        throwNotGood(stream);
+
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+        // FIXME: Implement another ErrorCode instead of the UNEXPECTED_SYMBOL,
+        // for this case, something like ERRNEWL. Because in this case, the
+        // error appears if the character next is NOT a newline.
+        c = stream.peek();
+        if (c == '\r') {
+            stream.get(c).get(c);
+            if (c != '\n') {
+                throw std::system_error(make_error_code(Libre::error::HttpParserErrorCodes::UNEXPECTED_SYMBOL));
+            }
+
+            // INFO: This happends if
+            // there are no more headers.
+            return false; 
+        }
+
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
 }
