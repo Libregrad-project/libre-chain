@@ -249,6 +249,8 @@ namespace Libre {
     }
 
 
+    // INFO: Actually read the body.
+
     void HttpParser::readBody(std::istream& stream, std::string& body, const size_t bodyLen) {
         size_t read = 0;
 
